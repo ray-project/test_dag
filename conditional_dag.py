@@ -104,14 +104,3 @@ with InputNode() as inp:
     order = create_order.bind(amount)
 
 serve_dag = DAGDriver.bind(order, http_adapter=json_resolver)
-app = serve.api.build(serve_dag)
-
-ray.init(address="auto")
-serve.start(detached=True, _override_controller_namespace="serve")
-handle = serve.run(serve_dag)
-# handle = serve.run(app)
-
-# import requests
-# print(requests.post("http://localhost:8000/", json=["ADD", 1]).text)
-
-print(ray.get(handle.predict.remote(["ADD", 1])))
