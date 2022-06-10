@@ -15,7 +15,11 @@ class Operation(str, Enum):
     MULTIPLICATION = "MUL"
 
 
-@serve.deployment
+@serve.deployment(
+    ray_actor_options={
+        "num_cpus": 0.1,
+    }
+)
 class Router:
 
     def __init__(self, multiplier: RayHandleLike, adder: RayHandleLike):
@@ -34,6 +38,7 @@ class Router:
         "factor": 3,
     },
     ray_actor_options={
+        "num_cpus": 0.1,
         "runtime_env": {
             "env_vars": {
                 "override_factor": "-2",
@@ -60,6 +65,7 @@ class Multiplier:
         "increment": 2,
     },
     ray_actor_options={
+        "num_cpus": 0.1,
         "runtime_env": {
             "env_vars": {
                 "override_increment": "-2",
@@ -81,7 +87,11 @@ class Adder:
         return input + self.increment
 
 
-@serve.deployment
+@serve.deployment(
+    ray_actor_options={
+        "num_cpus": 0.1,
+    }
+)
 def create_order(amount: int) -> str:
     return f"{amount} pizzas please!"
 

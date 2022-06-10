@@ -14,7 +14,11 @@ class Operation(str, Enum):
     SUBTRACT = "SUB"
 
 
-@serve.deployment
+@serve.deployment(
+    ray_actor_options={
+        "num_cpus": 0.1,
+    }
+)
 class Add:
     # Requires the test_dag repo as a py_module:
     # https://github.com/ray-project/test_dag
@@ -24,7 +28,11 @@ class Add:
         return add_one(input)
 
 
-@serve.deployment
+@serve.deployment(
+    ray_actor_options={
+        "num_cpus": 0.1,
+    }
+)
 class Subtract:
     # Requires the test_module repo as a py_module:
     # https://github.com/ray-project/test_module
@@ -34,7 +42,11 @@ class Subtract:
         return input - one()  # Returns input - 2
 
 
-@serve.deployment
+@serve.deployment(
+    ray_actor_options={
+        "num_cpus": 0.1,
+    }
+)
 class Router:
 
     def __init__(self, adder: RayHandleLike, subtractor: RayHandleLike):
