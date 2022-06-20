@@ -60,7 +60,7 @@ class OrangeStand:
         return self.price * amount
 
 
-@serve.deployment(user_config={"price": 4,})
+@serve.deployment(user_config={"price": 4})
 class PearStand:
 
     DEFAULT_PRICE = 0.75
