@@ -6,12 +6,18 @@ from ray.serve.deployment_graph import InputNode
 # These imports are used only for type hints:
 from typing import Dict, List
 from starlette.requests import Request
+from ray.serve.deployment_graph import ClassNode
 
 
 @serve.deployment(num_replicas=2)
 class FruitMarket:
 
-    def __init__(self, mango_stand, orange_stand, pear_stand):
+    def __init__(
+        self,
+        mango_stand: ClassNode,
+        orange_stand: ClassNode,
+        pear_stand: ClassNode,
+    ):
         self.directory = {
             "MANGO": mango_stand,
             "ORANGE": orange_stand,
