@@ -7,8 +7,10 @@ from ray import serve
 import starlette.requests
 from ray.serve.drivers import DAGDriver
 from ray.serve.deployment_graph import InputNode
+from ray.serve.handle import RayServeLazyAsyncHandle
 
 RayHandleLike = TypeVar("RayHandleLike")
+
 
 class Operation(str, Enum):
     ADDITION = "ADD"
@@ -21,16 +23,15 @@ class Operation(str, Enum):
     }
 )
 class Router:
-
-    def __init__(self, multiplier: RayHandleLike, adder: RayHandleLike):
+    def __init__(self, adder: RayServeLazyAsyncHandle, subtractor: RayServeLazyAsyncHandle):
         self.adder = adder
-        self.multiplier = multiplier
-    
-    def route(self, op: Operation, input: int) -> int:
-        if op == Operation.ADDITION:
-            return ray.get(self.adder.add.remote(input))
-        elif op == Operation.MULTIPLICATION:
-            return ray.get(self.multiplier.multiply.remote(input))
+        self.subtractor = subtractor
+
+    async def route(self, op: Operation, input: int) -> int:
+        if op == Operation.ADD:
+            return await (await self.adder.add.remote(input))
+        elif op == Operation.SUBTRACT:
+            return await (await self.subtractor.subtract.remote(input))
 
 
 @serve.deployment(
@@ -43,17 +44,16 @@ class Router:
             "env_vars": {
                 "override_factor": "-2",
             }
-        }
-    }
+        },
+    },
 )
 class Multiplier:
-
     def __init__(self, factor: int):
         self.factor = factor
-    
+
     def reconfigure(self, config: Dict):
         self.factor = config.get("factor", -1)
-    
+
     def multiply(self, input_factor: int) -> int:
         if os.getenv("override_factor") is not None:
             return input_factor * int(os.getenv("override_factor"))
@@ -70,17 +70,16 @@ class Multiplier:
             "env_vars": {
                 "override_increment": "-2",
             }
-        }
-    }
+        },
+    },
 )
 class Adder:
-
     def __init__(self, increment: int):
         self.increment = increment
 
     def reconfigure(self, config: Dict):
         self.increment = config.get("increment", -1)
-    
+
     def add(self, input: int) -> int:
         if os.getenv("override_increment") is not None:
             return input + int(os.getenv("override_increment"))

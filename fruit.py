@@ -7,6 +7,7 @@ from ray.serve.deployment_graph import InputNode
 from typing import Dict, List
 from starlette.requests import Request
 from ray.serve.deployment_graph import ClassNode
+from ray.serve.handle import RayServeLazyAsyncHandle
 
 
 @serve.deployment(num_replicas=2)
@@ -14,22 +15,22 @@ class FruitMarket:
 
     def __init__(
         self,
-        mango_stand: ClassNode,
-        orange_stand: ClassNode,
-        pear_stand: ClassNode,
+        mango_stand: RayServeLazyAsyncHandle,
+        orange_stand: RayServeLazyAsyncHandle,
+        pear_stand: RayServeLazyAsyncHandle,
     ):
         self.directory = {
             "MANGO": mango_stand,
             "ORANGE": orange_stand,
             "PEAR": pear_stand,
         }
-    
-    def check_price(self, fruit: str, amount: float) -> float:
+
+    async def check_price(self, fruit: str, amount: float) -> float:
         if fruit not in self.directory:
             return -1
         else:
             fruit_stand = self.directory[fruit]
-            return ray.get(fruit_stand.check_price.remote(amount))
+            return await (await fruit_stand.check_price.remote(amount))
 
 
 @serve.deployment(user_config={"price": 3})
@@ -41,10 +42,10 @@ class MangoStand:
         # This default price is overwritten by the one specified in the
         # user_config through the reconfigure() method.
         self.price = self.DEFAULT_PRICE
-    
+
     def reconfigure(self, config: Dict):
         self.price = config.get("price", self.DEFAULT_PRICE)
-    
+
     def check_price(self, amount: float) -> float:
         return self.price * amount
 
@@ -58,10 +59,10 @@ class OrangeStand:
         # This default price is overwritten by the one specified in the
         # user_config through the reconfigure() method.
         self.price = self.DEFAULT_PRICE
-    
+
     def reconfigure(self, config: Dict):
         self.price = config.get("price", self.DEFAULT_PRICE)
-    
+
     def check_price(self, amount: float) -> float:
         return self.price * amount
 
@@ -75,10 +76,10 @@ class PearStand:
         # This default price is overwritten by the one specified in the
         # user_config through the reconfigure() method.
         self.price = self.DEFAULT_PRICE
-    
+
     def reconfigure(self, config: Dict):
         self.price = config.get("price", self.DEFAULT_PRICE)
-    
+
     def check_price(self, amount: float) -> float:
         return self.price * amount
 
