@@ -6,9 +6,10 @@ from ray import serve
 import starlette.requests
 from ray.serve.drivers import DAGDriver
 from ray.serve.deployment_graph import InputNode
-from ray.serve.handle import RayServeLazyAsyncHandle
+from ray.serve.handle import RayServeDeploymentHandle
 
 RayHandleLike = TypeVar("RayHandleLike")
+
 
 class Operation(str, Enum):
     ADD = "ADD"
@@ -26,6 +27,7 @@ class Add:
 
     def add(self, input: int) -> int:
         from dir2.library import add_one
+
         return add_one(input)
 
 
@@ -40,6 +42,7 @@ class Subtract:
 
     def subtract(self, input: int) -> int:
         from test_module.test import one
+
         return input - one()  # Returns input - 2
 
 
@@ -49,7 +52,9 @@ class Subtract:
     }
 )
 class Router:
-    def __init__(self, adder: RayServeLazyAsyncHandle, subtractor: RayServeLazyAsyncHandle):
+    def __init__(
+        self, adder: RayServeDeploymentHandle, subtractor: RayServeDeploymentHandle
+    ):
         self.adder = adder
         self.subtractor = subtractor
 
