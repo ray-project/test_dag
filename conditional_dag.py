@@ -24,16 +24,16 @@ class Operation(str, Enum):
 )
 class Router:
     def __init__(
-        self, adder: RayServeDeploymentHandle, subtractor: RayServeDeploymentHandle
+        self, multiplier: RayServeDeploymentHandle, adder: RayServeDeploymentHandle
     ):
         self.adder = adder
-        self.subtractor = subtractor
+        self.multiplier = multiplier
 
     async def route(self, op: Operation, input: int) -> int:
-        if op == Operation.ADD:
+        if op == Operation.ADDITION:
             return await (await self.adder.add.remote(input))
-        elif op == Operation.SUBTRACT:
-            return await (await self.subtractor.subtract.remote(input))
+        elif op == Operation.MULTIPLICATION:
+            return await (await self.multiplier.multiply.remote(input))
 
 
 @serve.deployment(
