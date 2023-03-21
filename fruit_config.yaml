@@ -1,0 +1,22 @@
+import_path: fruit:deployment_graph
+
+runtime_env: {}
+
+deployments:
+
+- name: FruitMarket
+  num_replicas: 2
+
+- name: MangoStand
+  user_config:
+    price: 3
+
+- name: OrangeStand
+  user_config:
+    price: 2
+
+- name: PearStand
+  user_config:
+    price: 4
+
+- name: DAGDriver
