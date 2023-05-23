@@ -1,5 +1,5 @@
 from ray import serve
-import numpy as np
+import excalibur
 
 class CustomException(Exception):
 
