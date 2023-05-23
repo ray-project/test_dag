@@ -1,10 +1,10 @@
 from ray import serve
-import yaml
+import numpy as np
 
 class CustomException(Exception):
 
     def __init__(self, *args):
-        yaml.safe_load("[]")
+        self.zeros = np.zeros(5)
 
 raise CustomException("This is a custom exception!")
 
