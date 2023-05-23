@@ -1,9 +1,9 @@
 from ray import serve
-import excalibur
 
 class CustomException(Exception):
 
     def __init__(self, *args):
+        import numpy as np
         self.zeros = np.zeros(5)
 
 raise CustomException("This is a custom exception!")
