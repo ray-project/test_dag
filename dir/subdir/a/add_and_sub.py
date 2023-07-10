@@ -6,7 +6,7 @@ from ray import serve
 import starlette.requests
 from ray.serve.drivers import DAGDriver
 from ray.serve.deployment_graph import InputNode
-from ray.serve.handle import RayServeDeploymentHandle
+from ray.serve.handle import RayServeHandle
 
 RayHandleLike = TypeVar("RayHandleLike")
 
@@ -53,7 +53,7 @@ class Subtract:
 )
 class Router:
     def __init__(
-        self, adder: RayServeDeploymentHandle, subtractor: RayServeDeploymentHandle
+        self, adder: RayServeHandle, subtractor: RayServeHandle
     ):
         self.adder = adder
         self.subtractor = subtractor

@@ -7,7 +7,7 @@ from ray import serve
 import starlette.requests
 from ray.serve.drivers import DAGDriver
 from ray.serve.deployment_graph import InputNode
-from ray.serve.handle import RayServeDeploymentHandle
+from ray.serve.handle import RayServeHandle
 
 RayHandleLike = TypeVar("RayHandleLike")
 
@@ -24,7 +24,7 @@ class Operation(str, Enum):
 )
 class Router:
     def __init__(
-        self, multiplier: RayServeDeploymentHandle, adder: RayServeDeploymentHandle
+        self, multiplier: RayServeHandle, adder: RayServeHandle
     ):
         self.adder = adder
         self.multiplier = multiplier

@@ -7,16 +7,16 @@ from ray.serve.deployment_graph import InputNode
 from typing import Dict, List
 from starlette.requests import Request
 from ray.serve.deployment_graph import ClassNode
-from ray.serve.handle import RayServeDeploymentHandle
+from ray.serve.handle import RayServeHandle
 
 
 @serve.deployment(num_replicas=2)
 class FruitMarket:
     def __init__(
         self,
-        mango_stand: RayServeDeploymentHandle,
-        orange_stand: RayServeDeploymentHandle,
-        pear_stand: RayServeDeploymentHandle,
+        mango_stand: RayServeHandle,
+        orange_stand: RayServeHandle,
+        pear_stand: RayServeHandle,
     ):
         self.directory = {
             "MANGO": mango_stand,
