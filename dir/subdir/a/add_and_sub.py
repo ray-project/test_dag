@@ -52,17 +52,15 @@ class Subtract:
     }
 )
 class Router:
-    def __init__(
-        self, adder: RayServeHandle, subtractor: RayServeHandle
-    ):
-        self.adder = adder
-        self.subtractor = subtractor
+    def __init__(self, adder, subtractor):
+        self.adder = adder.options(use_new_handle_api=True)
+        self.subtractor = subtractor.options(use_new_handle_api=True)
 
     async def route(self, op: Operation, input: int) -> int:
         if op == Operation.ADD:
-            return await (await self.adder.add.remote(input))
+            return await self.adder.add.remote(input)
         elif op == Operation.SUBTRACT:
-            return await (await self.subtractor.subtract.remote(input))
+            return await self.subtractor.subtract.remote(input)
 
 
 async def json_resolver(request: starlette.requests.Request) -> List:

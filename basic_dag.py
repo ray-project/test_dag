@@ -1,5 +1,4 @@
 from ray import serve
-from ray.serve.deployment_graph import RayServeDAGHandle
 
 @serve.deployment(
     ray_actor_options={
@@ -16,11 +15,11 @@ def f(*args):
     }
 )
 class BasicDriver:
-    def __init__(self, dag: RayServeDAGHandle):
-        self.dag = dag
+    def __init__(self, h):
+        self._h = h.options(use_new_handle_api=True)
 
     async def __call__(self):
-        return await (await self.dag.remote())
+        return await self.dag.remote()
 
 
 FNode = f.bind()

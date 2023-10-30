@@ -7,7 +7,6 @@ from ray import serve
 import starlette.requests
 from ray.serve.drivers import DAGDriver
 from ray.serve.deployment_graph import InputNode
-from ray.serve.handle import RayServeHandle
 
 RayHandleLike = TypeVar("RayHandleLike")
 
@@ -23,17 +22,15 @@ class Operation(str, Enum):
     }
 )
 class Router:
-    def __init__(
-        self, multiplier: RayServeHandle, adder: RayServeHandle
-    ):
-        self.adder = adder
-        self.multiplier = multiplier
+    def __init__(self, multiplier, adder):
+        self.adder = adder.options(use_new_handle_api=True)
+        self.multiplier = multiplier.options(use_new_handle_api=True)
 
     async def route(self, op: Operation, input: int) -> int:
         if op == Operation.ADDITION:
-            return await (await self.adder.add.remote(input))
+            return await self.adder.add.remote(input)
         elif op == Operation.MULTIPLICATION:
-            return await (await self.multiplier.multiply.remote(input))
+            return await self.multiplier.multiply.remote(input)
 
 
 @serve.deployment(
