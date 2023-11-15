@@ -1,27 +1,23 @@
-import ray
 from ray import serve
-from ray.serve.drivers import DAGDriver
-from ray.serve.deployment_graph import InputNode
+from ray.serve.handle import DeploymentHandle
 
 # These imports are used only for type hints:
-from typing import Dict, List
+from typing import Dict
 from starlette.requests import Request
-from ray.serve.deployment_graph import ClassNode
-from ray.serve.handle import RayServeHandle
 
 
 @serve.deployment(num_replicas=2)
 class FruitMarket:
     def __init__(
         self,
-        mango_stand: RayServeHandle,
-        orange_stand: RayServeHandle,
-        pear_stand: RayServeHandle,
+        mango_stand: DeploymentHandle,
+        orange_stand: DeploymentHandle,
+        pear_stand: DeploymentHandle,
     ):
         self.directory = {
-            "MANGO": mango_stand,
-            "ORANGE": orange_stand,
-            "PEAR": pear_stand,
+            "MANGO": mango_stand.options(use_new_handle_api=True),
+            "ORANGE": orange_stand.options(use_new_handle_api=True),
+            "PEAR": pear_stand.options(use_new_handle_api=True),
         }
 
     async def check_price(self, fruit: str, amount: float) -> float:
@@ -29,7 +25,11 @@ class FruitMarket:
             return -1
         else:
             fruit_stand = self.directory[fruit]
-            return await (await fruit_stand.check_price.remote(amount))
+            return await fruit_stand.check_price.remote(amount)
+
+    async def __call__(self, request: Request) -> float:
+        fruit, amount = await request.json()
+        return await self.check_price(fruit, amount)
 
 
 @serve.deployment(user_config={"price": 3})
@@ -83,19 +83,8 @@ class PearStand:
         return self.price * amount
 
 
-async def json_resolver(request: Request) -> List:
-    return await request.json()
+mango_stand = MangoStand.bind()
+orange_stand = OrangeStand.bind()
+pear_stand = PearStand.bind()
 
-
-with InputNode() as query:
-    fruit, amount = query[0], query[1]
-
-    mango_stand = MangoStand.bind()
-    orange_stand = OrangeStand.bind()
-    pear_stand = PearStand.bind()
-
-    fruit_market = FruitMarket.bind(mango_stand, orange_stand, pear_stand)
-
-    net_price = fruit_market.check_price.bind(fruit, amount)
-
-deployment_graph = DAGDriver.bind(net_price, http_adapter=json_resolver)
+deployment_graph = FruitMarket.bind(mango_stand, orange_stand, pear_stand)
