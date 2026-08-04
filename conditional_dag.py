@@ -18,8 +18,8 @@ class Operation(str, Enum):
 )
 class Router:
     def __init__(self, multiplier, adder):
-        self.adder = adder.options(use_new_handle_api=True)
-        self.multiplier = multiplier.options(use_new_handle_api=True)
+        self.adder = adder
+        self.multiplier = multiplier
 
     async def route(self, op: Operation, input: int) -> int:
         if op == Operation.ADDITION:
