@@ -15,9 +15,9 @@ class FruitMarket:
         pear_stand: DeploymentHandle,
     ):
         self.directory = {
-            "MANGO": mango_stand.options(use_new_handle_api=True),
-            "ORANGE": orange_stand.options(use_new_handle_api=True),
-            "PEAR": pear_stand.options(use_new_handle_api=True),
+            "MANGO": mango_stand,
+            "ORANGE": orange_stand,
+            "PEAR": pear_stand,
         }
 
     async def check_price(self, fruit: str, amount: float) -> float:

@@ -16,7 +16,7 @@ def f(*args):
 )
 class BasicDriver:
     def __init__(self, h):
-        self._h = h.options(use_new_handle_api=True)
+        self._h = h
 
     async def __call__(self):
         return await self._h.remote()
